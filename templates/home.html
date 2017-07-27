@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if first_page_html %}
+<div class="row">
+    {{ first_page_html | safe}}
+</div>
+{% endif %}
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>站点</th>
+        <th>关键字</th>
+        <th>商品名称</th>
+        <th>价格</th>
+        <th>订单量</th>
+        <th>店家名</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for result in results %}
+      <tr>
+        <td>{{ result.query.site }}</td>
+        <td>{{ result.query }}</td>
+        <td>{{ result.title }}</td>
+        <td>{{ result.price }}</td>
+        <td>{{ result.order }}</td>
+        <td>{{ result.store }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+
+{% endblock content %}
