@@ -58,6 +58,8 @@ def store_crawled_result(result, query_instance):
     else:
         return False
 
+    print('数据长度： {}'.format(len(result['titles'])))
+
     for i in range(len(result['titles'])):
         QueryResult.objects.create(query=query_instance, title=result['titles'][i], price=result['prices'][i],
                                    order=result['orders'][i], store=result['stores'][i], )
