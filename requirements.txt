@@ -6,3 +6,6 @@ pytz==2017.2
 requests==2.18.1
 urllib3==1.21.1
 xlwt==1.2.0
+gunicorn==19.7.1
+dj-database-url==0.4.2
+psycopg2==2.7.1

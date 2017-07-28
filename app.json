@@ -1,0 +1,8 @@
+{
+  "name": "AliExpress Crawler",
+  "description": "Django AliExpress Crawler",
+  "image": "heroku/python",
+  "repository": "https://github.com/icnbrave/aliexpress_crawler.git",
+  "keywords": ["python", "django" ],
+  "addons": [ "heroku-postgresql" ]
+}
