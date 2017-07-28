@@ -1,13 +1,16 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, CreateView, TemplateView
+
 from .models import Country, Query
 from .forms import QueryForm
 
 UserModel = get_user_model()
 
-class HomeView(TemplateView):
+class HomeView( LoginRequiredMixin, TemplateView):
     template_name = "home.html"
+    login_url = '/admin/login/'
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
