@@ -32,7 +32,10 @@ def crawl(site, kw, pages):
     """
     Crawling according to the keywords {kw} on {site} in the first {pages} pages
     """
+    total_searched = 1
     results = []
+    item_num = 0
+
     for i in range(0, pages):  # 循环5次，就是5个页的商品数据
         page = i + 1  # 此处为页码，根据网页参数具体设置
         resp = get_page_html(site.url, kw, page)
@@ -40,8 +43,18 @@ def crawl(site, kw, pages):
         print(resp.url)  # 打印访问的网址
         resp.encoding = 'utf-8'  # 设置编码
 
+        # Get total searched count
+        if page == 1:
+            r = soup.find('strong', class_="search-count").text
+            total_searched = int(r.replace(',', ''))
+
         items = soup.find_all('div', class_='item')
         for index, item in enumerate(items):
+            item_num += 1
+
+            if (item_num >= total_searched):
+                break
+
             d = {'normal':True} # 初始化采集数据，过滤那些只有图片，没有产品描述的商品
 
             # 页数

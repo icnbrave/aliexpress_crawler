@@ -27,6 +27,7 @@ class QueryManager(models.Manager):
 
 class Query(models.Model):
     keywords = models.CharField(max_length=64, verbose_name=_('查询关键字'))
+    pages = models.IntegerField(default=1, blank=True, null=True, verbose_name=_('查询页数'))
     site = models.ForeignKey(Country, verbose_name=_('查询站点'))
     user = models.ForeignKey(User, verbose_name=_('查询用户'), default=1)
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name=_('查询时间'))
@@ -83,7 +84,8 @@ def store_crawled_result(results, query_instance):
 def query_post_save_receiver(sender, instance, *args, **kwargs):
     site = instance.site
     kw = instance.keywords
-    results = crawl(site, kw, settings.PAGE_SIZE)
+    pages = instance.pages
+    results = crawl(site, kw, pages)
     store_crawled_result(results, instance)
 
 post_save.connect(query_post_save_receiver, sender=Query)

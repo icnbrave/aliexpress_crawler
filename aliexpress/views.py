@@ -36,6 +36,9 @@ class HomeView( LoginRequiredMixin, TemplateView):
 
         kw = self.request.GET.get('q', None)
 
+        pages = self.request.GET.get('pages', '1')
+        pages = int(pages)
+
         user = self.request.user
         if not user.id:
             user = UserModel.objects.first()
@@ -49,7 +52,7 @@ class HomeView( LoginRequiredMixin, TemplateView):
             if qs.exists():
                 query = qs.first()
             else:
-                query = Query.objects.create(keywords=kw, site=Country.objects.get( id = int(site_id) ), user=user)
+                query = Query.objects.create(keywords=kw, site=Country.objects.get( id = int(site_id) ), pages=pages, user=user)
 
             # Query result
             context['query_requests'] = query.results.all()
