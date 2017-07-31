@@ -18,7 +18,7 @@ from django.conf.urls.static import static, serve
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 
-from aliexpress.views import QueryView, HomeView
+from aliexpress.views import HomeView, EnKWSerachView, RelatedKWSearchView
 
 
 from crawler import settings
@@ -26,7 +26,8 @@ from crawler import settings
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^q/$', QueryView.as_view(), name='q'),
+    url(r'^relatedkw/$', RelatedKWSearchView.as_view(), name='related'),
+    url(r'^enkw$', EnKWSerachView.as_view(), name='enkw'),
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
 

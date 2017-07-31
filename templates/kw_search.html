@@ -2,7 +2,7 @@
 
 {% block form %}
 
-    {% include "form.html" %}
+    {% include "kw_search_form.html" %}
 
 {% endblock form %}
 
@@ -12,31 +12,6 @@
 <div class="row">
     {{ first_page_html | safe}}
 </div>
-{% endif %}
-
-{% if en_keyword %}
-<div class="text-center">
-    对应的英文翻译： <em>{{ en_keyword }}</em>
-</div>
-{% endif %}
-
-{% if related_keywords %}
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>相关关键字</th>
-        <th>匹配数量</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for kw in related_keywords %}
-      <tr>
-        <td>{{ kw.keywords }}</td>
-        <td>{{ kw.count }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
 {% endif %}
 
 {% if query_requests %}

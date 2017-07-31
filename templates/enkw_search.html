@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block form %}
+
+    {% include "enkw_search_form.html" %}
+
+{% endblock form %}
+
+{% block content %}
+
+{% if result %}
+<div class="text-center">
+    对应的英文翻译： <br>
+    {% for key, value in result %}
+    <p>{{ key }} <-> {{ value }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock content %}

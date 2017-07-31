@@ -18,7 +18,7 @@ functions = [
 ]
 
 class HomeView( LoginRequiredMixin, TemplateView):
-    template_name = "home.html"
+    template_name = "kw_search.html"
     login_url = '/admin/login/'
 
     def get_context_data(self, **kwargs):
@@ -26,9 +26,6 @@ class HomeView( LoginRequiredMixin, TemplateView):
 
         sites = Country.objects.all()
         context['sites'] = sites
-
-        context['functions'] = functions
-        context['last_function_id'] = int( self.request.GET.get('function', 0) )
 
         site_id = self.request.GET.get('site', sites.first().id)
         context['last_site_id'] = int(site_id)
@@ -43,9 +40,8 @@ class HomeView( LoginRequiredMixin, TemplateView):
         if not user.id:
             user = UserModel.objects.first()
 
-        function_id = self.request.GET.get('function')
         # 查询关键字
-        if function_id == '1':
+        if kw:
             qs = Query.objects.filter(keywords=kw, site=Country.objects.get( id = int(site_id) ))
             query = None
 
@@ -57,24 +53,76 @@ class HomeView( LoginRequiredMixin, TemplateView):
             # Query result
             context['query_requests'] = query.results.all()
 
-        elif function_id == '2':
-            # Get related keywords information
+
+        context['title'] = '关键字查询'
+
+        return context
+
+
+
+class RelatedKWSearchView( LoginRequiredMixin, TemplateView):
+    template_name = "related_kw_search.html"
+    login_url = '/admin/login/'
+
+    def get_context_data(self, **kwargs):
+        context = super(RelatedKWSearchView, self).get_context_data(**kwargs)
+
+        sites = Country.objects.all()
+        context['sites'] = sites
+
+        site_id = self.request.GET.get('site', sites.first().id)
+        context['last_site_id'] = int(site_id)
+        site = Country.objects.filter(id = site_id).first()
+
+        kw = self.request.GET.get('q', None)
+
+        context['title'] = '相关关键字查询'
+
+        # Get related keywords information
+        if kw:
             related_keywords = get_related_keywords(site, kw)
             context['related_keywords'] = related_keywords
 
-        elif function_id == '3':
-            # Get relevant English translation of a non-English string
-            en_keyword = get_english_translation(kw)
-            context['en_keyword'] = en_keyword
-
         return context
 
 
-class QueryView(CreateView):
-    template_name = 'form.html'
-    form_class = QueryForm
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(QueryView, self).get_context_data(*args, **kwargs)
-        context['title'] = '查询'
+class EnKWSerachView( LoginRequiredMixin, TemplateView):
+    template_name = "enkw_search.html"
+    login_url = '/admin/login/'
+
+    def get_context_data(self, **kwargs):
+        context = super(EnKWSerachView, self).get_context_data(**kwargs)
+
+        sites = Country.objects.all()
+        context['sites'] = sites
+
+        site_id = self.request.GET.get('site', sites.first().id)
+        context['last_site_id'] = int(site_id)
+        site = Country.objects.filter(id = site_id).first()
+
+        kws = self.request.GET.get('q', None)
+
+        pages = self.request.GET.get('pages', '1')
+        pages = int(pages)
+
+        user = self.request.user
+        if not user.id:
+            user = UserModel.objects.first()
+
+        # Get relevant English translation of a non-English string
+
+        if kws:
+            # split keywords, and remove space in begin and end of the string
+            kws_arr = kws.split(',')
+            kws_arr = [kw.strip() for kw in kws_arr]
+
+            # search for each kwywords, and map searched keyword to the required keywords
+            result = [(kw, get_english_translation(kw)) for kw in kws_arr]
+
+            context['result'] = result
+
+        context['title'] = '英文翻译查询'
+
         return context
+

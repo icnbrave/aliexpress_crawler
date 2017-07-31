@@ -137,8 +137,6 @@ def get_related_keywords(site, kw):
         return None
 
 
-
-
 #
 # # 数据验证
 # print(len(title))

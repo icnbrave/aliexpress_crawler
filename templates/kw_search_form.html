@@ -1,0 +1,21 @@
+<form class="">
+    <div class="form-group">
+        <label for="site_id">查询站点: </label>
+        <select name="site" id="site_id" class="form-control">
+            {% for site in sites %}
+            <option value="{{ site.id }}" {% if site.id == last_site_id %}selected{% endif %}>{{ site.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="keyword">关键字: </label>
+        <input type="text" id="keyword" class="form-control" placeholder="查询关键字" name="q" value="{{ request.GET.q }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="page_count">查询页数: </label>
+        <input type="number" id="page_count" class="form-control" placeholder="查询页数" name="pages" value="{{ request.GET.pages }}" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block">开始查询</button>
+</form>

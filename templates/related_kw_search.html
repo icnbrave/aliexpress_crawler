@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block form %}
+
+    {% include "related_kw_search_form.html" %}
+
+{% endblock form %}
+
+{% block content %}
+
+{% if related_keywords %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>相关关键字</th>
+        <th>匹配数量</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for kw in related_keywords %}
+      <tr>
+        <td>{{ kw.keywords }}</td>
+        <td>{{ kw.count }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% endblock content %}
