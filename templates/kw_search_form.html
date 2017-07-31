@@ -1,7 +1,7 @@
 <form class="">
     <div class="form-group">
-        <label for="site_id">查询站点: </label>
-        <select name="site" id="site_id" class="form-control">
+        <label for="site_id">查询站点 (可多选): </label>
+        <select name="site" id="site_id" class="form-control" multiple="multiple">
             {% for site in sites %}
             <option value="{{ site.id }}" {% if site.id == last_site_id %}selected{% endif %}>{{ site.name }}</option>
             {% endfor %}

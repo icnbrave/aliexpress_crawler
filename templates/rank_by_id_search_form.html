@@ -1,17 +1,7 @@
 <form class="">
     <div class="form-group">
-        <label for="type_id">查询内容: </label>
-        <select name="function" id="type_id" class="form-control">
-            <option value="0" selected="selected">---- 请选择查询内容 ----</option>
-            {% for function in functions %}
-            <option value="{{ function.id }}" {% if function.id == last_function_id %}selected{% endif %}>{{ function.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="site_id">查询内容: </label>
-        <select name="site" id="site_id" class="form-control">
-            <option value="1" selected="selected">---- 请选择站点 ----</option>
+        <label for="site_id">选着站点 (可多选): </label>
+        <select name="sites" id="site_id" class="form-control" multiple="multiple" required>
             {% for site in sites %}
             <option value="{{ site.id }}" {% if site.id == last_site_id %}selected{% endif %}>{{ site.name }}</option>
             {% endfor %}
@@ -23,8 +13,8 @@
     </div>
 
     <div class="form-group">
-        <label for="page_count">查询页数: </label>
-        <input type="number" id="page_count" class="form-control" placeholder="查询页数" name="pages" value="{{ request.GET.pages }}" required>
+        <label for="product_id">产品ID: </label>
+        <input type="text" id="product_id" class="form-control" placeholder="32806707746" name="product_id" value="{{ request.GET.product_id }}" required>
     </div>
 
     <button type="submit" class="btn btn-primary btn-lg btn-block">开始查询</button>

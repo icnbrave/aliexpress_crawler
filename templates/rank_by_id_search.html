@@ -2,82 +2,19 @@
 
 {% block form %}
 
-    {% include "form.html" %}
+    {% include "rank_by_id_search_form.html" %}
 
 {% endblock form %}
 
+
 {% block content %}
 
-{% if first_page_html %}
-<div class="row">
-    {{ first_page_html | safe}}
-</div>
-{% endif %}
+{% if results %}
 
-{% if en_keyword %}
-<div class="text-center">
-    对应的英文翻译： <em>{{ en_keyword }}</em>
-</div>
-{% endif %}
+{% for site, value in results %}
+<div>{{ site }} - <strong>{{ value }}</strong></div>
+{% endfor %}
 
-{% if related_keywords %}
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>相关关键字</th>
-        <th>匹配数量</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for kw in related_keywords %}
-      <tr>
-        <td>{{ kw.keywords }}</td>
-        <td>{{ kw.count }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-{% endif %}
-
-{% if query_requests %}
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>站点</th>
-        <th>关键字</th>
-        <th>所在页数</th>
-        <th>页排名</th>
-        <th>商品名称</th>
-        <th>店家名</th>
-        <th>价格</th>
-        <th>订单量</th>
-        <th>评论数</th>
-        <th>好评率</th>
-        <th>星级分</th>
-        <!--<th>图片地址</th>-->
-        <!--<th>商品地址</th>-->
-      </tr>
-    </thead>
-    <tbody>
-    {% for result in query_requests %}
-      <tr>
-        <td>{{ result.query.site }}</td>
-        <td>{{ result.query }}</td>
-        <td>{{ result.page }}</td>
-        <td>{{ result.rank }}</td>
-        <td>{{ result.title }}</td>
-        <td>{{ result.store }}</td>
-        <td>{{ result.price }}</td>
-        <td>{{ result.orders }}</td>
-        <td>{{ result.comments }}</td>
-        <td>{{ result.credit_points }}</td>
-        <td>{{ result.rating }}</td>
-        <!--<td>{{ result.img_url }}</td>-->
-        <!--<td>{{ result.product_url }}</td>-->
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
 {% endif %}
 
 {% endblock content %}

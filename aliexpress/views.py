@@ -27,9 +27,7 @@ class HomeView( LoginRequiredMixin, TemplateView):
         sites = Country.objects.all()
         context['sites'] = sites
 
-        site_id = self.request.GET.get('site', sites.first().id)
-        context['last_site_id'] = int(site_id)
-        site = Country.objects.filter(id = site_id).first()
+        site_ids = self.request.GET.getlist('site', [sites.first().id])
 
         kw = self.request.GET.get('q', None)
 
@@ -42,17 +40,22 @@ class HomeView( LoginRequiredMixin, TemplateView):
 
         # 查询关键字
         if kw:
-            qs = Query.objects.filter(keywords=kw, site=Country.objects.get( id = int(site_id) ))
-            query = None
+            qlist = []
+            for site_id in site_ids:
+                qs = Query.objects.filter(keywords=kw, site=Country.objects.get( id = int(site_id) ))
 
-            if qs.exists():
-                query = qs.first()
-            else:
-                query = Query.objects.create(keywords=kw, site=Country.objects.get( id = int(site_id) ), pages=pages, user=user)
+                if qs.exists():
+                    query = qs.first()
+                else:
+                    query = Query.objects.create(keywords=kw, site=Country.objects.get( id = int(site_id) ), pages=pages, user=user)
+                qlist.append(query)
 
             # Query result
-            context['query_requests'] = query.results.all()
+            query_results = []
+            for q in qlist:
+                query_results += q.results.all()
 
+            context['query_results'] = query_results
 
         context['title'] = '关键字查询'
 
@@ -126,3 +129,43 @@ class EnKWSerachView( LoginRequiredMixin, TemplateView):
 
         return context
 
+
+class RankSerachView( LoginRequiredMixin, TemplateView):
+    template_name = "rank_by_id_search.html"
+    login_url = '/admin/login/'
+
+    def get_context_data(self, **kwargs):
+        context = super(RankSerachView, self).get_context_data(**kwargs)
+
+        sites = Country.objects.all()
+        context['sites'] = sites
+
+        product_id = self.request.GET.get('product_id', None)
+        kw = self.request.GET.get('q', None)
+
+        # get selected site id(s)
+        sites_selected = self.request.GET.getlist('sites', None)
+        results = []
+        if product_id and sites_selected and kw:
+            # Get the query for each site
+            for site_selected in sites_selected:
+                site = Country.objects.filter(id=site_selected).first()
+                qs1 = Query.objects.filter(site=site, keywords=kw)
+                if qs1.exists():
+                    query_instance = qs1.first()
+                else:
+                    d = (site.name, '{0} 在该站点尚未爬取数据'.format(kw))
+                    results.append(d)
+                    continue
+
+                qs = query_instance.results.filter(product_code=product_id)
+                if qs.exists():
+                    d = (site.name, qs.first().overall_rank)
+                else:
+                    d = (site.name, '{0} 在该站点抓取的数据中，没有找到该产品'.format(kw))
+                results.append(d)
+
+        context['title'] = '产品在不同站点排名'
+        context['results'] = results
+
+        return context

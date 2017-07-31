@@ -14,7 +14,7 @@
 </div>
 {% endif %}
 
-{% if query_requests %}
+{% if query_results %}
 <table class="table table-striped">
     <thead>
     <tr>
@@ -34,7 +34,7 @@
       </tr>
     </thead>
     <tbody>
-    {% for result in query_requests %}
+    {% for result in query_results %}
       <tr>
         <td>{{ result.query.site }}</td>
         <td>{{ result.query }}</td>
