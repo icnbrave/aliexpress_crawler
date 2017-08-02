@@ -94,10 +94,12 @@ def query_result_post_save_receiver(sender, instance, *args, **kwargs):
     # get overall_rank
     _rank = 0
     for i in range(instance.page):
-        if i + 1 < instance.page:
-            _rank += instance.__class__.objects.filter(page=i + 1).count()
+        # overall_rank = 上一页 max_overall_rank + 当前页 rank
+        if i + 1 == 1:
+            _rank = instance.rank
         else:
-            _rank += instance.rank
+            max_overall_rank_in_prepage = instance.query.results.filter(page = i).aggregate(models.Max('overall_rank'))['overall_rank__max']
+            _rank = instance.rank + max_overall_rank_in_prepage
 
     # get product code
     product_url = instance.product_url

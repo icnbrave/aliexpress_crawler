@@ -15,7 +15,7 @@ date = datetime.datetime.now().strftime('%Y-%m-%d')  # 给文件打上时间戳�
 url = 'https://www.aliexpress.com/wholesale'  # 网址
 payload = {'SearchText': 'nike', 'page': '1', 'ie': 'utf8', 'g': 'y'}  # 字典传递url参数
 
-def get_page_html(site, kw, page):
+def get_page_resp(session, site, kw, page):
     headers = requests.utils.default_headers()
     headers.update(
         {
@@ -25,7 +25,7 @@ def get_page_html(site, kw, page):
     payload['SearchText'] = kw
     payload['page'] = page
     url = '{site}/wholesale'.format(site=site)
-    resp = requests.get(url, params=payload)
+    resp = session.get(url, params=payload)
     return resp
 
 def crawl(site, kw, pages):
@@ -36,9 +36,20 @@ def crawl(site, kw, pages):
     results = []
     item_num = 0
 
+    payload = {
+        "loginId": "121697524@qq.com",
+        "password": "q1w2e3r4",
+    }
+
+    LOGIN_URL = 'https://login.aliexpress.com/buyer.htm?spm=2114.12010608.1000002.4.EihgQ5&return=https%3A%2F%2Fwww.aliexpress.com%2Fstore%2F1816376%3Fspm%3D2114.10010108.0.0.fs2frD&random=CAB39130D12E432D4F5D75ED04DC0A84'
+
+    session_requests = requests.session()
+    session_requests.get(LOGIN_URL)
+    session_requests.post(LOGIN_URL, data=payload)
+
     for i in range(0, pages):  # 循环5次，就是5个页的商品数据
         page = i + 1  # 此处为页码，根据网页参数具体设置
-        resp = get_page_html(site.url, kw, page)
+        resp = get_page_resp(session_requests, site.url, kw, page)
         soup = bs4.BeautifulSoup(resp.text, "html.parser")
         print(resp.url)  # 打印访问的网址
         resp.encoding = 'utf-8'  # 设置编码

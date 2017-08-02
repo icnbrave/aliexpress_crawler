@@ -3,19 +3,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, CreateView, TemplateView
 
-from tools.crawler_task import get_related_keywords, get_english_translation
+from tools.crawler_task import get_related_keywords, get_english_translation, get_page_resp
 
 from .models import Country, Query
 from .forms import QueryForm
 
 UserModel = get_user_model()
-
-functions = [
-    {'name': '关键字查询', 'id': 1},
-    {'name': '相关关键字查询', 'id': 2},
-    {'name': '对应英文关键字', 'id': 3},
-    {'name': '产品对应站点排名', 'id': 4},
-]
 
 class HomeView( LoginRequiredMixin, TemplateView):
     template_name = "kw_search.html"
@@ -167,5 +160,44 @@ class RankSerachView( LoginRequiredMixin, TemplateView):
 
         context['title'] = '产品在不同站点排名'
         context['results'] = results
+
+        return context
+
+class PreView(LoginRequiredMixin, TemplateView):
+    template_name = 'preview.html'
+    login_url = '/admin/login/'
+
+    def get_context_data(self, **kwargs):
+        context = super(PreView, self).get_context_data(**kwargs)
+
+        sites = Country.objects.all()
+        context['sites'] = sites
+
+        site_id = self.request.GET.get('site', sites.first().id)
+        site = Country.objects.filter(id=site_id).first()
+
+        kw = self.request.GET.get('q', None)
+
+        user = self.request.user
+        if not user.id:
+            user = UserModel.objects.first()
+
+        # 查询关键字
+        if kw:
+            payload = {
+                "loginId": "121697524@qq.com",
+                "password": "q1w2e3r4",
+            }
+
+            LOGIN_URL = 'https://login.aliexpress.com/buyer.htm?spm=2114.12010608.1000002.4.EihgQ5&return=https%3A%2F%2Fwww.aliexpress.com%2Fstore%2F1816376%3Fspm%3D2114.10010108.0.0.fs2frD&random=CAB39130D12E432D4F5D75ED04DC0A84'
+
+            import requests
+            session_requests = requests.session()
+            session_requests.get(LOGIN_URL)
+            session_requests.post(LOGIN_URL, data=payload)
+            resp = get_page_resp(session_requests, site.url, kw, 1)
+            context['first_page_html'] = resp.text
+
+        context['title'] = '查找第一页预览'
 
         return context
