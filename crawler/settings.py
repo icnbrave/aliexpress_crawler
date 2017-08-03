@@ -25,6 +25,8 @@ SECRET_KEY = '^0ny1vgqbe#h$!%&t3tych*u++qo0zya*y8=-ch68*w1be2d%2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+DEPLOY = "heroku" # 'local' or 'heroku'
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -83,16 +85,18 @@ WSGI_APPLICATION = 'crawler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if DEPLOY == 'local':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
-
-# Parse database configuration from $DATABASE_URL
-# import dj_database_url
-# DATABASES['default'] =  dj_database_url.config()
+else:
+    #Parse database configuration from $DATABASE_URL
+    import dj_database_url
+    DATABASES = {}
+    DATABASES['default'] =  dj_database_url.config()
 
 
 # Password validation
