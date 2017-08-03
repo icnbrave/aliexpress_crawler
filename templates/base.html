@@ -2,25 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block head_title %}AliExpress Crawler{% endblock head_title %}</title>
+    <title> AliExpress Crawler | {{ title }}</title>
     {% include 'snippets/css.html' %}
 </head>
 <body>
-{% include 'snippets/nav.html' %}
+    <div class="container">
+      <!-- Static navbar -->
+        {% include 'snippets/nav.html' %}
 
-    <div class="row">
-      <div class="col-md-4 search-form">
-          <div >
-              {% block form %}{% endblock form %}
+        <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <div class="row">
+          <div class="col-md-12 search-form">
+              <div >
+                  {% block form %}{% endblock form %}
+              </div>
           </div>
+        </div>
       </div>
-      <div class="col-md-8 search-result">
-          <div>
-            {% block content %}{% endblock content %}
+        <div class="row">
+           <div class="col-md-12 search-result">
+              <div>
+                {% block content %}{% endblock content %}
+              </div>
           </div>
       </div>
     </div>
-
 {% include 'snippets/js.html' %}
 </body>
 </html>
