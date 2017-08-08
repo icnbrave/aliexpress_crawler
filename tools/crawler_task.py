@@ -15,6 +15,19 @@ date = datetime.datetime.now().strftime('%Y-%m-%d')  # 给文件打上时间戳�
 url = 'https://www.aliexpress.com/wholesale'  # 网址
 payload = {'SearchText': 'nike', 'page': '1', 'ie': 'utf8', 'g': 'y'}  # 字典传递url参数
 
+def auth():
+    payload = {
+        "loginId": "121697524@qq.com",
+        "password": "q1w2e3r4",
+    }
+
+    LOGIN_URL = 'https://login.aliexpress.com/buyer.htm?spm=2114.12010608.1000002.4.EihgQ5&return=https%3A%2F%2Fwww.aliexpress.com%2Fstore%2F1816376%3Fspm%3D2114.10010108.0.0.fs2frD&random=CAB39130D12E432D4F5D75ED04DC0A84'
+
+    session_requests = requests.session()
+    session_requests.get(LOGIN_URL)
+    session_requests.post(LOGIN_URL, data=payload)
+    return session_requests
+
 def get_page_resp(session, site, kw, page):
     headers = requests.utils.default_headers()
     headers.update(
@@ -36,16 +49,7 @@ def crawl(site, kw, pages):
     results = []
     item_num = 0
 
-    payload = {
-        "loginId": "121697524@qq.com",
-        "password": "q1w2e3r4",
-    }
-
-    LOGIN_URL = 'https://login.aliexpress.com/buyer.htm?spm=2114.12010608.1000002.4.EihgQ5&return=https%3A%2F%2Fwww.aliexpress.com%2Fstore%2F1816376%3Fspm%3D2114.10010108.0.0.fs2frD&random=CAB39130D12E432D4F5D75ED04DC0A84'
-
-    session_requests = requests.session()
-    session_requests.get(LOGIN_URL)
-    session_requests.post(LOGIN_URL, data=payload)
+    session_requests = auth()
 
     for i in range(0, pages):  # 循环5次，就是5个页的商品数据
         page = i + 1  # 此处为页码，根据网页参数具体设置
@@ -130,10 +134,10 @@ def crawl(site, kw, pages):
 
 
 def get_related_keywords(site, kw):
-    s = requests.Session()
-    s.get(site.url)
-
     url = "https://connectkeyword.aliexpress.com/lenoIframeJson.htm?varname=intelSearchData&__number=2&catId=0&keyword={kw}".format(kw=kw)
+
+    s = auth()
+
     res = s.get(url)
 
     if not res:
@@ -147,35 +151,8 @@ def get_related_keywords(site, kw):
     except:
         return None
 
-
-#
-# # 数据验证
-# print(len(title))
-# print(len(price))
-# print(len(order))
-# print(len(store))
-#
-# if len(title) == len(price) == len(order) == len(store):
-#     print("数据完整，生成 %d 组商品数据！" % len(title))
-#
-# # 写入excel文档
-# print("正在写入excel表格...")
-# wookbook = xlwt.Workbook(encoding='utf-8')  # 创建工作簿
-# data_sheet = wookbook.add_sheet('demo')  # 创建sheet
-#
-# # 生成每一行数据
-# for n in range(len(title)):
-#     data_sheet.write(n, 0, n + 1)
-#     data_sheet.write(n, 1, title[n])  # n 表示行， 1 表示列
-#     data_sheet.write(n, 2, price[n])
-#     data_sheet.write(n, 3, order[n])
-#     data_sheet.write(n, 4, store[n])
-#
-# wookbook.save("%s-%s.xls" % (payload['SearchText'], date))
-# print("写入excel表格成功！")
-
 def get_english_translation(kw):
-    s = requests.Session()
+    s = auth()
 
     url = "https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20170729014525&SearchText={kw}".format(kw=kw)
     resp = s.get(url)
