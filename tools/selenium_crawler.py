@@ -8,11 +8,7 @@ from urllib.parse import urlencode
 from tools.crawler_task import auth
 import traceback
 
-
-LOGIN_URL = 'https://login.aliexpress.com/buyer.htm?spm=2114.11010108.1000002.7.6bb2d449PlxkIR&return=https%3A%2F%2Fwww.aliexpress.com%2F&random=46C4127371C13A0ED2EA46652B3EAFC8'
-LOGIN_USER = '121697524@qq.com'
-LOGIN_PASSWD = 'q1w2e3r4'
-
+from tools import config
 
 date = datetime.datetime.now().strftime('%Y-%m-%d')  # 给文件打上时间戳，便于数据更新
 SEARCH_URL = 'https://www.aliexpress.com/wholesale'  # 网址
@@ -24,7 +20,7 @@ class AliCrawler:
 
     def get_driver(self):
         if not self._driver:
-            chromedriver = '/Users/frankin/Downloads/chromedriver'
+            chromedriver = config.CHROMEDRIVER_PATH
             os.environ['webdriver.chrome.driver'] = chromedriver
             driver = webdriver.Chrome(chromedriver)
             driver.maximize_window()
@@ -36,11 +32,11 @@ class AliCrawler:
 
         driver = self.get_driver()
 
-        driver.get(LOGIN_URL)
+        driver.get(config.LOGIN_URL)
         login_frame = driver.find_element_by_id('alibaba-login-box')
         driver.switch_to.frame(login_frame)
-        driver.find_element_by_css_selector('#fm-login-id').send_keys(LOGIN_USER)
-        driver.find_element_by_css_selector('#fm-login-password').send_keys(LOGIN_PASSWD)
+        driver.find_element_by_css_selector('#fm-login-id').send_keys(config.LOGIN_USER)
+        driver.find_element_by_css_selector('#fm-login-password').send_keys(config.LOGIN_PASSWD)
         driver.find_element_by_css_selector('#fm-login-submit').click()
         time.sleep(5)
 
