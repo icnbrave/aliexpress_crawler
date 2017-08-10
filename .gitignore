@@ -3,3 +3,5 @@ db.sqlite3
 *.pyc
 videos
 tools/test.py
+tools/config.py
+tools/test_selenium.py

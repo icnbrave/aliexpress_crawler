@@ -6,6 +6,7 @@ from django.conf import settings
 import re
 
 from tools.crawler_task import crawl
+from tools.selenium_crawler import AliCrawler
 
 User = get_user_model()
 
@@ -85,7 +86,11 @@ def query_post_save_receiver(sender, instance, *args, **kwargs):
     site = instance.site
     kw = instance.keywords
     pages = instance.pages
-    results = crawl(site, kw, pages)
+    # results = crawl(site, kw, pages)
+    crawler = AliCrawler()
+    crawler.login()
+    results = crawler.parse(site, kw, pages)
+    crawler.get_driver().quit()
     store_crawled_result(results, instance)
 
 post_save.connect(query_post_save_receiver, sender=Query)

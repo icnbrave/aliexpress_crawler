@@ -8,6 +8,8 @@ from tools.crawler_task import get_related_keywords, get_english_translation, ge
 from .models import Country, Query
 from .forms import QueryForm
 
+from tools.selenium_crawler import AliCrawler
+
 UserModel = get_user_model()
 
 class HomeView( LoginRequiredMixin, TemplateView):
@@ -113,8 +115,13 @@ class EnKWSerachView( LoginRequiredMixin, TemplateView):
             kws_arr = kws.split(',')
             kws_arr = [kw.strip() for kw in kws_arr]
 
+            crawler = AliCrawler()
+            crawler.login()
+
             # search for each kwywords, and map searched keyword to the required keywords
-            result = [(kw, get_english_translation(kw)) for kw in kws_arr]
+            result = [(kw, crawler.get_english_translation(kw)) for kw in kws_arr]
+
+            crawler.get_driver().quit()
 
             context['result'] = result
 

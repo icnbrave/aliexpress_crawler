@@ -1,6 +1,11 @@
 # encoding = utf-8
 
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
 import time, datetime
 import os
 import re
@@ -21,25 +26,35 @@ class AliCrawler:
     def get_driver(self):
         if not self._driver:
             chromedriver = config.CHROMEDRIVER_PATH
+            cap = DesiredCapabilities.CHROME
+            cap['pageLoadStrategy'] = 'none'
+
             os.environ['webdriver.chrome.driver'] = chromedriver
-            driver = webdriver.Chrome(chromedriver)
+            driver = webdriver.Chrome(chromedriver, desired_capabilities=cap)
+
             driver.maximize_window()
             self._driver = driver
             return self._driver
+
         return self._driver
 
     def login(self):
-
         driver = self.get_driver()
+        wait = WebDriverWait(driver, 30)
 
         driver.get(config.LOGIN_URL)
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#alibaba-login-box')))
+
         login_frame = driver.find_element_by_id('alibaba-login-box')
         driver.switch_to.frame(login_frame)
+
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#fm-login-id')))
         driver.find_element_by_css_selector('#fm-login-id').send_keys(config.LOGIN_USER)
         driver.find_element_by_css_selector('#fm-login-password').send_keys(config.LOGIN_PASSWD)
         driver.find_element_by_css_selector('#fm-login-submit').click()
-        time.sleep(5)
 
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#form-searchbar')))
+        driver.execute_script('window.stop();')
 
     def search(self, site_url, kw, page):
         payload = {}
@@ -47,36 +62,48 @@ class AliCrawler:
         payload['page'] = page
         payload['g'] = 'y'
         url = '{site}/wholesale?{params_string}'.format(site=site_url, params_string=urlencode(payload))
-        self.get_driver().get(url)
+
+        driver = self.get_driver()
+
+        wait = WebDriverWait(driver, 20)
+
+        driver.get(url)
+
+        time.sleep(2)
+
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#hs-below-list-items')))
+        driver.execute_script('window.stop();')
+
+        self.close_layer()
 
     def parse(self, site, kw, pages):
         """
         Crawling according to the keywords {kw} on {site} in the first {pages} pages
         """
-        total_searched = 1
+        total_searched = None
         results = []
         item_num = 0
 
         driver = self.get_driver()
 
-        init_rank = 0
-
         for i in range(0, pages):  # 循环5次，就是5个页的商品数据
+            init_rank = 0
+
+            if total_searched and item_num + 40 >= total_searched:
+                break
+
             page = i + 1  # 此处为页码，根据网页参数具体设置
             self.search(site.url, kw, page)
+            print(driver.current_url)
 
             # Get total searched count
             if page == 1:
-                print(driver.current_url)
                 r = driver.find_element_by_css_selector('strong.search-count').text
                 total_searched = int(r.replace(',', ''))
 
             items = driver.find_elements_by_css_selector('div.item')
             for index, item in enumerate(items):
                 item_num += 1
-
-                if (item_num >= total_searched):
-                    break
 
                 d = {'normal':True} # 初始化采集数据，过滤那些只有图片，没有产品描述的商品
 
@@ -169,13 +196,22 @@ class AliCrawler:
             return None
 
     def get_english_translation(self, kw):
-        driver = self.get_driver()
+        site_url = 'https://www.aliexpress.com'
+        self.search(site_url, kw, 1)
 
-        url = "https://www.aliexpress.com/wholesale?catId=0&SearchText={kw}".format(kw=kw)
-        driver.get(url)
-        script = driver.find_elements_by_css_selector('head script[type="text/javascript"]')[1]
+        driver = self.get_driver()
+        script = driver.find_elements_by_css_selector('head script[type="text/javascript"]')[0]
         # for index, script in enumerate(scripts):
         #     print(index, script.get_attribute('innerHTML'))
         tmp = script.get_attribute('innerHTML')
         result = re.search(r'"enKeyword":"([\w| ]+)"', tmp)
         return result.group(1)
+
+    def close_layer(self):
+        driver = self.get_driver()
+        try:
+            elements = driver.find_elements_by_css_selector('.close-layer')
+            if elements.__len__() > 0:
+                elements[0].click()
+        except:
+            pass
