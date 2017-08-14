@@ -3,3 +3,5 @@ LOGIN_USER = '121697524@qq.com'
 LOGIN_PASSWD = 'q1w2e3r4'
 
 CHROMEDRIVER_PATH = '/Users/frankin/Downloads/chromedriver'
+
+SKIP_CRAWL_IF_EXIST = False
