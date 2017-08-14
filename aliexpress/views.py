@@ -10,6 +10,8 @@ from .forms import QueryForm
 
 from tools.selenium_crawler import AliCrawler
 
+from tools import config
+
 UserModel = get_user_model()
 
 class HomeView( LoginRequiredMixin, TemplateView):
@@ -36,13 +38,19 @@ class HomeView( LoginRequiredMixin, TemplateView):
         # 查询关键字
         if kw:
             qlist = []
-            for site_id in site_ids:
-                qs = Query.objects.filter(keywords=kw, site=Country.objects.get( id = int(site_id) ))
 
-                if qs.exists():
-                    query = qs.first()
+            for site_id in site_ids:
+                if config.SKIP_CRAWL_IF_EXIST:
+                    qs = Query.objects.filter(keywords=kw, site=Country.objects.get( id = int(site_id) ))
+
+                    if qs.exists():
+                        query = qs.first()
+                    else:
+                        query = Query.objects.create(keywords=kw, site=Country.objects.get( id = int(site_id) ), pages=pages, user=user)
                 else:
-                    query = Query.objects.create(keywords=kw, site=Country.objects.get( id = int(site_id) ), pages=pages, user=user)
+                    query = Query.objects.create(keywords=kw, site=Country.objects.get(id=int(site_id)), pages=pages,
+                                                 user=user)
+
                 qlist.append(query)
 
             # Query result
