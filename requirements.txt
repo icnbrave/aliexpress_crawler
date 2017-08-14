@@ -1,23 +1,8 @@
 beautifulsoup4==4.6.0
-certifi==2017.4.17
-chardet==3.0.4
-dj-database-url==0.4.2
 Django==1.11.3
-django-custom-user==0.7
 -e git+https://github.com/fgmacedo/django-export-action@fb9b4a88b864f408a36049ecfc3825bd1626b848#egg=django_export_action
-django-filters==0.2.1
-django-hashers-passlib==0.3
-djangorestframework==3.4.6
-djangorestframework-expiring-authtoken==0.1.4
-et-xmlfile==1.0.1
 gunicorn==19.7.1
-idna==2.5
-jdcal==1.3
 lxml==3.8.0
-mysqlclient==1.3.10
-openpyxl==2.4.8
-passlib==1.7.1
-psycopg2==2.7.1
 pytz==2017.2
 requests==2.18.1
 six==1.10.0
