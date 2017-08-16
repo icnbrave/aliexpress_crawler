@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, CreateView, TemplateView
 
-from tools.crawler_task import get_related_keywords, get_english_translation, get_page_resp
+from tools.crawler_task import get_page_resp
 
 from .models import Country, Query
 from .forms import QueryForm
@@ -86,8 +86,13 @@ class RelatedKWSearchView( LoginRequiredMixin, TemplateView):
 
         # Get related keywords information
         if kw:
-            related_keywords = get_related_keywords(site, kw)
+            crawler = AliCrawler()
+            crawler.login()
+
+            related_keywords = crawler.get_related_keywords(site, kw)
             context['related_keywords'] = related_keywords
+
+            crawler.get_driver().quit()
 
         return context
 

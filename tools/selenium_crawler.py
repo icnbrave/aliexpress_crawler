@@ -56,6 +56,18 @@ class AliCrawler:
         wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#form-searchbar')))
         driver.execute_script('window.stop();')
 
+    def render_until(self, url, timeout, css_selector):
+        driver = self.get_driver()
+
+        wait = WebDriverWait(driver, timeout)
+
+        driver.get(url)
+
+        time.sleep(2)
+
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+        driver.execute_script('window.stop();')
+
     def search(self, site_url, kw, page):
         payload = {}
         payload['SearchText'] = kw
@@ -73,6 +85,8 @@ class AliCrawler:
 
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#hs-below-list-items')))
         driver.execute_script('window.stop();')
+
+        # self.render_until(url, 20, '#hs-below-list-items')
 
         self.close_layer()
 
@@ -172,40 +186,55 @@ class AliCrawler:
                 except:
                     traceback.print_exc()
                     print(d['product_url'])
-                    print(item.find('span', class_='rate-percent'))
+                    # print(item.find_element_by_css_selector('span.rate-percent'))
 
         return results
-
-
-    def get_related_keywords(self, site, kw):
-        url = "https://connectkeyword.aliexpress.com/lenoIframeJson.htm?varname=intelSearchData&__number=2&catId=0&keyword={kw}".format(kw=kw)
-
-        s = auth()
-
-        res = s.get(url)
-
-        if not res:
-            return None
-        try:
-            tmp = res.text.split('=')[-1].strip()
-            true = True
-            false = False
-
-            return eval(tmp)['keyWordDTOs']
-        except:
-            return None
 
     def get_english_translation(self, kw):
         site_url = 'https://www.aliexpress.com'
         self.search(site_url, kw, 1)
 
         driver = self.get_driver()
-        script = driver.find_elements_by_css_selector('head script[type="text/javascript"]')[0]
-        # for index, script in enumerate(scripts):
-        #     print(index, script.get_attribute('innerHTML'))
-        tmp = script.get_attribute('innerHTML')
-        result = re.search(r'"enKeyword":"([\w| ]+)"', tmp)
+        scripts = driver.find_elements_by_css_selector('head script[type="text/javascript"]')
+
+        script_html = None
+
+        for index, script in enumerate(scripts):
+            tmp = script.get_attribute('innerHTML')
+            if tmp:
+                script_html = tmp
+                break
+
+        if not script_html:
+            return kw
+
+        result = re.search(r'"enKeyword":"([\w| ]+)"', script_html)
         return result.group(1)
+
+    def get_related_keywords(self, site, kw):
+
+        url = "https://connectkeyword.aliexpress.com/lenoIframeJson.htm?varname=intelSearchData&__number=2&catId=0&keyword={kw}".format(
+            kw=kw)
+
+        self.render_until(site.url, 10, "#form-searchbar")
+
+        self.get_driver().get(url)
+
+        time.sleep(2)
+
+        res = self.get_driver().find_element_by_css_selector('body').get_attribute('innerHTML')
+
+        if not res:
+            return None
+        try:
+            tmp = res.split('=')[-1].strip()
+            true = True
+            false = False
+
+            return eval(tmp)['keyWordDTOs']
+        except:
+            traceback.print_exc()
+            return None
 
     def close_layer(self):
         driver = self.get_driver()

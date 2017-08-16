@@ -9,7 +9,8 @@
 {% block content %}
 
 {% if related_keywords %}
-<table class="table table-striped">
+<div class="container" style="width: 50%;">
+    <table class="table table-striped">
     <thead>
     <tr>
         <th>相关关键字</th>
@@ -24,7 +25,8 @@
       </tr>
     {% endfor %}
     </tbody>
-  </table>
+</table>
+</div>
 {% endif %}
 
 {% endblock content %}
