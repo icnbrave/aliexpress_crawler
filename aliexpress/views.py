@@ -5,7 +5,7 @@ from django.views.generic import View, CreateView, TemplateView
 
 from tools.crawler_task import get_page_resp
 
-from .models import Country, Query
+from .models import Country, Query,RelatedQuery,RelatedQueryResult
 from .forms import QueryForm
 
 from tools.selenium_crawler import AliCrawler
@@ -60,7 +60,7 @@ class HomeView( LoginRequiredMixin, TemplateView):
 
             context['query_results'] = query_results
 
-        context['title'] = '关键字查询'
+        context['title'] = '潜力款分析'
 
         return context
 
@@ -82,10 +82,12 @@ class RelatedKWSearchView( LoginRequiredMixin, TemplateView):
 
         kw = self.request.GET.get('q', None)
 
-        context['title'] = '相关关键字查询'
+        context['title'] = '下拉词分析'
 
         # Get related keywords information
         if kw:
+            query = RelatedQuery.objects.create(keywords=kw, site=Country.objects.get(id=int(site_id)), user=self.request.user)
+
             crawler = AliCrawler()
             crawler.login()
 
@@ -93,6 +95,14 @@ class RelatedKWSearchView( LoginRequiredMixin, TemplateView):
             context['related_keywords'] = related_keywords
 
             crawler.get_driver().quit()
+
+            context['related_keywords'] = related_keywords
+            context['export_url'] = '/admin/aliexpress/relatedqueryresult/?query__id__exact={q_id}'.format(q_id=query.id)
+
+            if related_keywords:
+                for kw in related_keywords:
+                    RelatedQueryResult.objects.create(query=query, keywords = kw['keywords'], count = kw['count'])
+
 
         return context
 
@@ -138,7 +148,7 @@ class EnKWSerachView( LoginRequiredMixin, TemplateView):
 
             context['result'] = result
 
-        context['title'] = '英文翻译查询'
+        context['title'] = '小语种翻译'
 
         return context
 
@@ -178,7 +188,7 @@ class RankSerachView( LoginRequiredMixin, TemplateView):
                     d = (site.name, '{0} 在该站点抓取的数据中，没有找到该产品'.format(kw))
                 results.append(d)
 
-        context['title'] = '产品在不同站点排名'
+        context['title'] = '国家站点排名'
         context['results'] = results
 
         return context

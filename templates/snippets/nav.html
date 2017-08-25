@@ -15,10 +15,10 @@
         {% url 'enkw' as enkw %}
         {% url 'rank' as rank %}
         <ul class="nav navbar-nav">
-          <li {% if request.path == home %} class="active" {% endif %}><a href="{% url 'home' %}">关键字</a></li>
-          <li {% if request.path == related %} class="active" {% endif %}><a href="{% url 'related' %}">相关关键字</a></li>
-          <li {% if request.path == enkw %} class="active" {% endif %}><a href="{% url 'enkw' %}">英文翻译</a></li>
-          <li {% if request.path == rank %} class="active" {% endif %}><a href="{% url 'rank'  %}">排名</a></li>
+          <li {% if request.path == home %} class="active" {% endif %}><a href="{% url 'home' %}">潜力款分析</a></li>
+          <li {% if request.path == related %} class="active" {% endif %}><a href="{% url 'related' %}">下拉词分析</a></li>
+          <li {% if request.path == enkw %} class="active" {% endif %}><a href="{% url 'enkw' %}">小语种翻译</a></li>
+          <li {% if request.path == rank %} class="active" {% endif %}><a href="{% url 'rank'  %}">国家站排名</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="">您好: {{ request.user.username }}</a></li>

@@ -64,6 +64,32 @@ class QueryResult(models.Model):
     def __str__(self):
         return self.title
 
+class RelatedQueryResultManager(models.Manager):
+    pass
+class RelatedQueryManager(models.Manager):
+    pass
+class RelatedQuery(models.Model):
+    keywords = models.CharField(max_length=64, verbose_name=_('查询关键字'))
+    site = models.ForeignKey(Country, verbose_name=_('查询站点'))
+    user = models.ForeignKey(User, verbose_name=_('查询用户'), default=1)
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name=_('查询时间'))
+
+    objects = RelatedQueryManager()
+
+    def __str__(self):
+        return self.keywords
+
+class RelatedQueryResult(models.Model):
+    query = models.ForeignKey(RelatedQuery, verbose_name=_('查询关键字'), related_name='results')
+    keywords = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('相关词'))
+    count = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('数量'))
+
+    objects = RelatedQueryResultManager()
+
+    def __str__(self):
+        return '{0} - {1}'.format(self.keywords, self.count)
+
+
 def store_crawled_result(results, query_instance):
 
     for result in results:
@@ -83,12 +109,14 @@ def store_crawled_result(results, query_instance):
         )
 
 def query_post_save_receiver(sender, instance, *args, **kwargs):
-    site = instance.site
-    kw = instance.keywords
-    pages = instance.pages
-    # results = crawl(site, kw, pages)
     crawler = AliCrawler()
     crawler.login()
+
+    site = instance.site
+    kw = instance.keywords
+
+    pages = instance.pages
+    # results = crawl(site, kw, pages)
     results = crawler.parse(site, kw, pages)
     crawler.get_driver().quit()
     store_crawled_result(results, instance)
