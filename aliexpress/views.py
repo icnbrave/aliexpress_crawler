@@ -55,10 +55,16 @@ class HomeView( LoginRequiredMixin, TemplateView):
 
             # Query result
             query_results = []
+            query_list = []
             for q in qlist:
                 query_results += q.results.all()
+                obj = {}
+                obj['export_url'] = '/admin/aliexpress/queryresult/?query__id__exact={0}'.format(q.id)
+                obj['site'] = q.site.name
+                query_list.append(obj)
 
             context['query_results'] = query_results
+            context['qlist'] = query_list
 
         context['title'] = '潜力款分析'
 

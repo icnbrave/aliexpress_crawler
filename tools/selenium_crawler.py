@@ -44,13 +44,16 @@ class AliCrawler:
 
         driver.get(config.LOGIN_URL)
         wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#alibaba-login-box')))
-
+        time.sleep(5)
         login_frame = driver.find_element_by_id('alibaba-login-box')
         driver.switch_to.frame(login_frame)
 
         wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#fm-login-id')))
+        time.sleep(1)
         driver.find_element_by_css_selector('#fm-login-id').send_keys(config.LOGIN_USER)
+        time.sleep(1)
         driver.find_element_by_css_selector('#fm-login-password').send_keys(config.LOGIN_PASSWD)
+        time.sleep(1)
         driver.find_element_by_css_selector('#fm-login-submit').click()
 
         wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, '#form-searchbar')))

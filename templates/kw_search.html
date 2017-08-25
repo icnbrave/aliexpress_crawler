@@ -15,6 +15,11 @@
 {% endif %}
 
 {% if query_results %}
+<div class="pull-left">
+    {% for query in qlist %}
+    <a href="{{ query.export_url }}" class="btn btn-primary">导出 {{ query.site }} 查询结果</a>
+    {% endfor %}
+</div>
 <table class="table table-striped">
     <thead>
     <tr>
