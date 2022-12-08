@@ -1,5 +1,5 @@
 beautifulsoup4==4.6.0
-certifi==2017.7.27.1
+certifi==2022.12.7
 chardet==3.0.4
 Django==1.11.3
 -e git+https://github.com/fgmacedo/django-export-action@fb9b4a88b864f408a36049ecfc3825bd1626b848#egg=django_export_action
